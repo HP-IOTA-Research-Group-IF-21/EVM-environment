@@ -9,15 +9,15 @@ popd() {
 }
 
 print_help_exit() {
-	printf "usage: $(basename $0) [--iota] [--ipfs] [--all] [-h|--help] <mode>\n"
+	printf "usage: $(basename $0) [--besu] [--ipfs] [--all] [-h|--help] <mode>\n"
 	printf '\t%s\t%s\n' "<mode>" "mode for the environment start | stop"
-	printf '\t%s\t%s\n' "--iota" "compose component for IOTA environment"
+	printf '\t%s\t%s\n' "--besu" "compose component for besu environment"
 	printf '\t%s\t%s\n' "--ipfs" "compose component for IPFS environment"
 	printf '\t%s\t%s\n' "--all" "short alias for all compose at once"
     exit 0
 }
 
-ENVIRONMENT=("./iota_sandbox" "./ipfs_cluster")
+ENVIRONMENT=("./besu_test_network" "./ipfs_cluster")
 COMPOSE=(false false)
 
 # Default values
@@ -31,7 +31,7 @@ parse_commandline() {
 	do
 		_key="$1"
 		case "$_key" in
-			--iota)
+			--besu)
                 COMPOSE[0]=true
 				;;
 			--ipfs)

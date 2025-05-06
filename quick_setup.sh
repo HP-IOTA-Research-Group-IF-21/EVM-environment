@@ -41,37 +41,14 @@ else
 	echo -e "${SUCCESS} Docker found:\t$(cat /tmp/cmdpath)"
 fi
 
-# Install sed
-if ! command -v sed &> /tmp/cmdpath
+# Install npx
+if ! command -v npx &> /tmp/cmdpath
 then
-	echo "${WARN} Please install sed; suggested install commands:"
-	echo "sudo apt-update && sudo apt-install -y sed"
+	echo "${WARN} Please install nodejs, npm, & npx; suggested install commands:"
+	echo "sudo apt-update && sudo apt-install -y nodejs npm"
 	EXIT=1
 else
-	echo -e "${SUCCESS} sed found:\t\t$(cat /tmp/cmdpath)"
-fi
-
-# Install jq
-if ! command -v jq &> /tmp/cmdpath
-then
-	echo "${WARN} Please install jq; suggested install commands:"
-	echo "sudo apt-update && sudo apt-install -y jq"
-	EXIT=1
-else
-	echo -e "${SUCCESS} jq found:\t\t$(cat /tmp/cmdpath)"
-fi
-
-IOTA_DIR="./iota_sandbox"
-if [[ ! -d $IOTA_DIR ]]
-then
-	mkdir $IOTA_DIR
-	pushd $IOTA_DIR
-	curl -L https://github.com/iotaledger/iota-sandbox/releases/latest/download/iota_sandbox.tar.gz | tar -zx
-	cp .env.example .env
-	popd
-	echo -e "${SUCCESS} IOTA Sandbox setup download complete"
-else
-	echo -e "${SUCCESS} IOTA Sandbox setup found"
+	echo -e "${SUCCESS} npx found:\t\t$(cat /tmp/cmdpath)"
 fi
 
 IPFS_DIR="./ipfs_cluster"
@@ -100,19 +77,6 @@ then
 	else
 		echo -e "${SUCCESS} IPFS cluster ctl found: ${IPFS_CTL_DIR}"
 	fi
-
-	# IOTA WASP CLI
-	WASP_CLI_DIR="./bin/wasp_cli"
-	if [[ ! -d $WASP_CLI_DIR ]]
-	then
-		mkdir -p $WASP_CLI_DIR
-		curl -L https://github.com/iotaledger/wasp/releases/download/v1.5.3/wasp-cli_1.5.3_Linux_x86_64.tar.gz \
-		| tar -zx -C $WASP_CLI_DIR --strip-components=1
-		echo -e "${SUCCESS} WASP cli download complete"
-	else
-		echo -e "${SUCCESS} WASP cli found: ${WASP_CLI_DIR}"
-	fi
-
 	echo "To complete setup, run \"source .bashrc\" to export path to terminal"
 fi
 

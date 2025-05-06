@@ -1,6 +1,5 @@
-# IOTA sandbox
-iota_sandbox/.env
-iota_sandbox/data/
+# Besu test network
+besu_test_network/logs
 
 # IPFS
 # Local IPFS cluster volume

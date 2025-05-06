@@ -1,0 +1,180 @@
+x-besu-def:
+  &besu-def
+  restart: "on-failure"
+  image: hyperledger/besu:${BESU_VERSION:-latest}
+  env_file:
+    - ./config/besu/.env
+  entrypoint:
+    - /bin/bash
+    - -c
+    - |
+
+      cp "/config/${BESU_CONS_ALGO:-QBFT}genesis.json" /config/genesis.json
+
+      /opt/besu/bin/besu \
+      --config-file=/config/config.toml \
+      --p2p-host=$$(hostname -i) \
+      --rpc-http-api=EEA,WEB3,ETH,NET,TRACE,DEBUG,ADMIN,TXPOOL,PERM,${BESU_CONS_ALGO:-QBFT} \
+      --rpc-ws-api=EEA,WEB3,ETH,NET,TRACE,DEBUG,ADMIN,TXPOOL,PERM,${BESU_CONS_ALGO:-QBFT} ;
+
+
+services:
+
+  validator1:
+    << : *besu-def
+    ports:
+      - 21001:8545/tcp
+      - 30303
+      - 9545
+    environment:
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=validator1,service.version=${BESU_VERSION:-latest}
+    labels:
+      - "consensus=besu"
+    volumes:
+      - ./config/besu/:/config
+      - ./config/nodes/validator1:/opt/besu/keys
+      - ./logs/besu:/tmp/besu
+    networks:
+      besu-test-network:
+        ipv4_address: 172.16.239.11
+
+  validator2:
+    << : *besu-def
+    ports:
+      - 21002:8545/tcp
+      - 30303
+      - 9545
+    environment:
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=validator2,service.version=${BESU_VERSION:-latest}
+    labels:
+      - "consensus=besu"
+    volumes:
+      - ./config/besu/:/config
+      - ./config/nodes/validator2:/opt/besu/keys
+      - ./logs/besu:/tmp/besu
+    depends_on:
+      - validator1
+    networks:
+      besu-test-network:
+        ipv4_address: 172.16.239.12
+
+  validator3:
+    << : *besu-def
+    ports:
+      - 21003:8545/tcp
+      - 30303
+      - 9545
+    environment:
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=validator3,service.version=${BESU_VERSION:-latest}
+    labels:
+      - "consensus=besu"
+    volumes:
+      - ./config/besu/:/config
+      - ./config/nodes/validator3:/opt/besu/keys
+      - ./logs/besu:/tmp/besu
+    depends_on:
+      - validator1
+    networks:
+      besu-test-network:
+        ipv4_address: 172.16.239.13
+
+  validator4:
+    << : *besu-def
+    ports:
+      - 21004:8545/tcp
+      - 30303
+      - 9545
+    environment:
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=validator4,service.version=${BESU_VERSION:-latest}
+    labels:
+      - "consensus=besu"
+    volumes:
+      - ./config/besu/:/config
+      - ./config/nodes/validator4:/opt/besu/keys
+      - ./logs/besu:/tmp/besu
+    depends_on:
+      - validator1
+    networks:
+      besu-test-network:
+        ipv4_address: 172.16.239.14
+
+  rpcnode:
+    << : *besu-def
+    container_name: rpcnode
+    environment:
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=rpcnode,service.version=${BESU_VERSION:-latest}
+    volumes:
+      - ./config/besu/:/config
+      - ./config/nodes/rpcnode:/opt/besu/keys
+      - ./logs/besu:/tmp/besu
+    depends_on:
+      - validator1
+    ports:
+      - 8545:8545/tcp
+      - 8546:8546/tcp
+    networks:
+      besu-test-network:
+        ipv4_address: 172.16.239.15
+
+# Grafana and Loki Monitoring
+  prometheus:
+    image: "prom/prometheus:v3.3.1"
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090/tcp
+    networks:
+      besu-test-network:
+        ipv4_address: ${PROMETHEUS_IP:-172.16.239.32}
+
+  grafana:
+    image: "grafana/grafana:12.0.0"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_USERS_VIEWERS_CAN_EDIT=true
+    volumes:
+      - ./config/grafana/provisioning/:/etc/grafana/provisioning/
+      - grafana:/var/lib/grafana
+    ports:
+      - 3000:3000/tcp
+    networks:
+      besu-test-network:
+        ipv4_address: ${GRAFANA_IP:-172.16.239.33}
+
+  loki:
+    image: "grafana/loki:3.5"
+    volumes:
+      - ./loki/loki.yml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - 3100:3100/tcp
+    networks:
+      besu-test-network:
+        ipv4_address: ${LOKI_IP:-172.16.239.34}
+
+  promtail:
+    image: "grafana/promtail:2.8.4"
+    volumes:
+      - ./logs:/var/log
+      - ./promtail/promtail.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      besu-test-network:
+        ipv4_address: ${PROMTAIL_IP:-172.16.239.35}
+
+
+volumes:
+  public-keys:
+  prometheus:
+  grafana:
+
+networks:
+  besu-test-network:
+    name: besu-test-network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.239.0/24
