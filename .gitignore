@@ -5,5 +5,11 @@ besu_test_network/logs
 # Local IPFS cluster volume
 ipfs_cluster/compose/
 
+# Blockscout
+blockscout/redis-data
+blockscout/blocscout-db-data
+blockscout/logs
+blockscout/dets
+
 # CLI Client
 bin/

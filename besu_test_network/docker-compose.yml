@@ -128,7 +128,7 @@ services:
       - 9090:9090/tcp
     networks:
       besu-test-network:
-        ipv4_address: ${PROMETHEUS_IP:-172.16.239.32}
+        ipv4_address: ${PROMETHEUS_ADDRESS:-172.16.239.32}
 
   grafana:
     image: "grafana/grafana:12.0.0"
@@ -142,7 +142,7 @@ services:
       - 3000:3000/tcp
     networks:
       besu-test-network:
-        ipv4_address: ${GRAFANA_IP:-172.16.239.33}
+        ipv4_address: ${GRAFANA_ADDRESS:-172.16.239.33}
 
   loki:
     image: "grafana/loki:3.5"
@@ -153,7 +153,7 @@ services:
       - 3100:3100/tcp
     networks:
       besu-test-network:
-        ipv4_address: ${LOKI_IP:-172.16.239.34}
+        ipv4_address: ${LOKI_ADDRESS:-172.16.239.34}
 
   promtail:
     image: "grafana/promtail:2.8.4"
@@ -163,7 +163,7 @@ services:
     command: -config.file=/etc/promtail/config.yml
     networks:
       besu-test-network:
-        ipv4_address: ${PROMTAIL_IP:-172.16.239.35}
+        ipv4_address: ${PROMTAIL_ADDRESS:-172.16.239.35}
 
 
 volumes:

@@ -9,16 +9,17 @@ popd() {
 }
 
 print_help_exit() {
-	printf "usage: $(basename $0) [--besu] [--ipfs] [--all] [-h|--help] <mode>\n"
+	printf "usage: $(basename $0) [--besu] [--ipfs] [--blockscout] [--all] [-h|--help] <mode>\n"
 	printf '\t%s\t%s\n' "<mode>" "mode for the environment start | stop"
 	printf '\t%s\t%s\n' "--besu" "compose component for besu environment"
 	printf '\t%s\t%s\n' "--ipfs" "compose component for IPFS environment"
+	printf '\t%s\t%s\n' "--blockscout" "compose component for IPFS environment"
 	printf '\t%s\t%s\n' "--all" "short alias for all compose at once"
     exit 0
 }
 
-ENVIRONMENT=("./besu_test_network" "./ipfs_cluster")
-COMPOSE=(false false)
+ENVIRONMENT=("./besu_test_network" "./ipfs_cluster" "./blockscout")
+COMPOSE=(false false false)
 
 # Default values
 _positionals=()
@@ -36,6 +37,9 @@ parse_commandline() {
 				;;
 			--ipfs)
                 COMPOSE[1]=true
+				;;
+			--blockscout)
+                COMPOSE[2]=true
 				;;
             --all)
                 for ((i=0; i<${#COMPOSE[@]}; i++))

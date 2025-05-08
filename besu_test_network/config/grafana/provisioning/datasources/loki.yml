@@ -18,7 +18,7 @@ datasources:
     # <int> org id. will default to orgId 1 if not specified
     orgId: 1
     # <string> url
-    url: http://$LOKI_IP:3100/
+    url: http://$LOKI_ADDRESS:3100/
     # <string> Deprecated, use secureJsonData.password
     password:
     # <string> database user, if used
