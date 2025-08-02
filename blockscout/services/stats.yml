@@ -22,9 +22,9 @@ services:
         POSTGRES_DB: 'stats'
         POSTGRES_USER: 'stats'
         POSTGRES_PASSWORD: 'n0uejXPl61ci6ldCuE2gQU5Y'
-    ports:
-      - target: 5432
-        published: 7433
+    # ports:
+    #   - target: 5432
+    #     published: 7433
     volumes:
       - ./stats-db-data:/var/lib/postgresql/data
     healthcheck:
@@ -36,7 +36,7 @@ services:
 
   stats:
     image: ghcr.io/blockscout/stats:${STATS_DOCKER_TAG:-latest}
-    pull_policy: always
+    # pull_policy: always
     platform: linux/amd64
     restart: always
     container_name: 'stats'

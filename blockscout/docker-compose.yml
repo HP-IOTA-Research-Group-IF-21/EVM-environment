@@ -3,11 +3,21 @@ services:
     extends:
       file: ./services/redis.yml
       service: redis-db
+    volumes:
+      - redis-db-data:/data
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.23
 
   db-init:
     extends:
       file: ./services/db.yml
       service: db-init
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.21
 
   db:
     depends_on:
@@ -16,6 +26,11 @@ services:
     extends:
       file: ./services/db.yml
       service: db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.22
 
   backend:
     depends_on:
@@ -34,42 +49,49 @@ services:
     environment:
       ETHEREUM_JSONRPC_HTTP_URL: http://host.docker.internal:8545/
       ETHEREUM_JSONRPC_TRACE_URL: http://host.docker.internal:8545/
-      ETHEREUM_JSONRPC_WS_URL: ws://host.docker.internal:8545/
+      ETHEREUM_JSONRPC_WS_URL: ws://host.docker.internal:8546/
       CHAIN_ID: '1337'
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.20
 
-  nft_media_handler:
-    depends_on:
-      - backend
-    extends:
-      file: ./services/nft_media_handler.yml
-      service: nft_media_handler
-    build:
-      context: ..
-      dockerfile: ./docker/Dockerfile
-      args:
-        RELEASE_VERSION: 9.0.0
+  # nft_media_handler:
+  #   depends_on:
+  #     - backend
+  #   extends:
+  #     file: ./services/nft_media_handler.yml
+  #     service: nft_media_handler
+  #   build:
+  #     context: ..
+  #     dockerfile: ./docker/Dockerfile
+  #     args:
+  #       RELEASE_VERSION: 9.0.0
 
   visualizer:
     extends:
       file: ./services/visualizer.yml
       service: visualizer
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.110
 
   sig-provider:
     extends:
       file: ./services/sig-provider.yml
       service: sig-provider
-
-  frontend:
-    depends_on:
-      - backend
-    extends:
-      file: ./services/frontend.yml
-      service: frontend
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.120
 
   stats-db-init:
     extends:
       file: ./services/stats.yml
       service: stats-db-init
+    volumes:
+      - stats-db-data:/var/lib/postgresql/data
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.131
 
   stats-db:
     depends_on:
@@ -78,6 +100,11 @@ services:
     extends:
       file: ./services/stats.yml
       service: stats-db
+    volumes:
+      - stats-db-data:/var/lib/postgresql/data
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.132
 
   stats:
     depends_on:
@@ -86,6 +113,11 @@ services:
     extends:
       file: ./services/stats.yml
       service: stats
+    volumes:
+      - stats-db-data:/var/lib/postgresql/data
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.130
 
   user-ops-indexer:
     depends_on:
@@ -94,6 +126,9 @@ services:
     extends:
       file: ./services/user-ops-indexer.yml
       service: user-ops-indexer
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.140
 
   proxy:
     depends_on:
@@ -103,7 +138,24 @@ services:
     extends:
       file: ./services/nginx.yml
       service: proxy
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.2
 
+  frontend:
+    depends_on:
+      - backend
+    extends:
+      file: ./services/frontend.yml
+      service: frontend
+    networks:
+      blockscout:
+        ipv4_address: 172.16.240.10
+
+volumes:
+  db-data:
+  redis-db-data:
+  stats-db-data:
 
 networks:
   blockscout:
