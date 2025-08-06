@@ -13,13 +13,6 @@
 - [localhost:5001/webui](localhost:5001/webui)
 
 ## References
-### IOTA Sandbox
-* https://wiki.iota.org/iota-sandbox/welcome/
-* https://wiki.iota.org/iota-sandbox/getting-started/
-* https://wiki.iota.org/iota-sandbox/references/keys/
-
-### IOTA WASP CLI
-* https://wiki.iota.org/wasp/how-tos/wasp-cli/
 
 ### IPFS Cluster
 * https://docs.ipfs.tech/install/server-infrastructure/#create-a-local-cluster
